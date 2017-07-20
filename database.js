@@ -19,29 +19,29 @@ var Database = {
 	varName: null,
 	varNameDict: {
 		"ftEmployed" : "Full time employment",
-    "ftGradschool" : "Graduate school",
-    "ptEmployed" : "Part time employment",
-    "gapYear" : "Took a gap year",
-    "jobSearch" : "Job hunting",
-    "careerFTE" : "Career Svcs FTE",
-    "careerServices" : "No. of services offered",
-    "orgsRecruiting" : "No. of companies recruiting",
-    "operatingBudget" :	"Career Svcs. budget",
-    "employerPartners" : "Career Svcs. partners",
-    "totalCostAttendance" :	"Total tuition & board",
-    "pellGrants" : "No. of pell grants",
-    "graduatingClassSize" :	"Graduating class size",
-    "totalSchoolSize" :	"Total student population",
-    "totalRevenue" : "Total school revenue",
-    "retentionRate" : "Undergrad retention rate",
-    "studentFacultyRatio" :	"Student/Faculty ratio",
-    "graduationRate" : "Graduation rate",
-    "financialAidFirst" : "Financial aid to freshmen",
-    "financialAidAll" : "Financial aid to all",
-    "fulltimeFaculty" : "Full time faculty",
-    "numberApplicants" : "Number of applicants",
-    "admitRate" : "Rate of admission",
-    "admitYield" : "Yield on admissions",
+		"ftGradschool" : "Graduate school",
+		"ptEmployed" : "Part time employment",
+		"gapYear" : "Took a gap year",
+		"jobSearch" : "Job hunting",
+		"careerFTE" : "Career Svcs FTE",
+		"careerServices" : "No. of services offered",
+		"orgsRecruiting" : "No. of companies recruiting",
+		"operatingBudget" :	"Career Svcs. budget",
+		"employerPartners" : "Career Svcs. partners",
+		"totalCostAttendance" :	"Total tuition & board",
+		"pellGrants" : "No. of pell grants",
+		"graduatingClassSize" :	"Graduating class size",
+		"totalSchoolSize" : "Total student population",
+		"totalRevenue" : "Total school revenue",
+		"retentionRate" : "Undergrad retention rate",
+		"studentFacultyRatio" :	"Student/Faculty ratio",
+		"graduationRate" : "Graduation rate",
+		"financialAidFirst" : "Financial aid to freshmen",
+		"financialAidAll" : "Financial aid to all",
+		"fulltimeFaculty" : "Full time faculty",
+		"numberApplicants" : "Number of applicants",
+		"admitRate" : "Rate of admission",
+		"admitYield" : "Yield on admissions",
 	},
 
 	currentYear: 2015,
@@ -52,7 +52,7 @@ var Database = {
 
 		d3.csv("csv/libarts2013.csv", type, function(data2013) {
 		d3.csv("csv/libarts2014.csv", type, function(data2014) {
-		d3.csv("csv/libarts.csv", type, function(data2015) {
+		d3.csv("csv/libarts2015.csv", type, function(data2015) {
 		d3.csv("csv/schools.csv", function(schools) {
 
 			self.data[0] = data2013;
