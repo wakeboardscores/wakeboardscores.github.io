@@ -1,3 +1,2 @@
-# WakeBoard example data
-
-Top 50 liberal arts colleges
+# wakeboardscores.github.io
+Performance of schools on career development metrics

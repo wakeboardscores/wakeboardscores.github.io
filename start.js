@@ -36,7 +36,7 @@ $(function(){
 	d3.select("#year-select")
 		.attr("width", 770)
 		.attr("height", 20);
-	d3.select("#current-state")
+	d3.select("#current-school")
 		.attr("width", 770)
 		.attr("height", 20);
 

@@ -4,10 +4,10 @@ var DotPlot = {
 	margin: {top: 30, right: 10, bottom: 0, left: 10},
 	svg: null,
 
-	allRankings: [[], [], [], []], // allRankings[0] = 2013 ... allRankings[3] = 2016
-	summaryRankings: [[], [], [], []],
+	allRankings: [[], [], []], // allRankings[0] = 2013 ... allRankings[2] = 2015
+	summaryRankings: [[], [], []],
 
-	currentState: "",
+	currentSchool: "",
 	needRestore: false, // if it is a bar chart and the user wants to sort, restore is needed
 		
 	init: function(viewWidth, viewHeight) {
@@ -31,32 +31,32 @@ var DotPlot = {
 	changePlot: function() {
 		var self = this;
 
-		if (self.currentState == "bar")
+		if (self.currentSchool == "bar")
 			self.initDotPlot();
-		else if (self.currentState == "dot")
+		else if (self.currentSchool == "dot")
 			self.initBarChart();
 	},
 	initBarChart: function() {
 		var self = this;
 
-		if (self.currentState == "bar") // just in case
+		if (self.currentSchool == "bar") // just in case
 			return;
-		else if (self.currentState == "dot") // changing from dot to bar
+		else if (self.currentSchool == "dot") // changing from dot to bar
 			self.svg.selectAll("*").remove();
 
 		var yScale = d3.scale.ordinal()
-								.domain(Database.state)
+								.domain(Database.school)
 								.rangeBands([0, self.height]);
 
-		var state = self.svg.selectAll(".state")
+		var school = self.svg.selectAll(".school")
 							.data(self.summaryRankings[Database.currentIndex])
 							.enter()
 							.append("g")
 							.attr("class", function(d) {
-								return d[0][0].state.split(' ').join('-') + " state";
+								return d[0][0].school.split(' ').join('-') + " school";
 							})
 							.attr("transform", function(d) {
-								return "translate(0, " + yScale(d[0][0].state) + ")";
+								return "translate(0, " + yScale(d[0][0].school) + ")";
 							})
 							.attr("cursor", "pointer")
 							.on("mouseenter", function(d, i) {
@@ -65,17 +65,17 @@ var DotPlot = {
 									.attr("fill", "#999999");
 
 								// show the user that some is high and some is low
-								var stateRankings = Database.data[Database.currentIndex][i]; // an object
-								for (key in stateRankings) {
-									if (stateRankings[key] <= 17) {
+								var schoolRankings = Database.data[Database.currentIndex][i]; // an object
+								for (key in schoolRankings) {
+									if (schoolRankings[key] <= 17) {
 										ArcView.svg.select("text." + key)
 													.style("fill", Database.highColour);
 									}
-									else if (stateRankings[key] > 17 && stateRankings[key] <= 34) {
+									else if (schoolRankings[key] > 17 && schoolRankings[key] <= 34) {
 										ArcView.svg.select("text." + key)
 													.style("fill", Database.moderateColour);
 									}
-									else if (stateRankings[key] > 34) {
+									else if (schoolRankings[key] > 34) {
 										ArcView.svg.select("text." + key)
 													.style("fill", Database.lowColour);
 									}
@@ -90,13 +90,13 @@ var DotPlot = {
 													.style("opacity", null);
 								}
 
-								// find common states
+								// find common schools
 								if (ArcView.isTwo) {
-									self.findCommonStates(stateRankings.abbr, "outcome");
-									self.findCommonStates(stateRankings.abbr, "factor");
+									self.findCommonSchools(schoolRankings.abbr, "outcome");
+									self.findCommonSchools(schoolRankings.abbr, "factor");
 								}
 								else {
-									self.findCommonStates(stateRankings.abbr, "variable");
+									self.findCommonSchools(schoolRankings.abbr, "variable");
 								}
 
 							})
@@ -109,7 +109,7 @@ var DotPlot = {
 								// restore text color
 								ArcView.svg.selectAll(".var-name text")
 											.style("fill", function(d) {
-												var outcomes = ["premDeath", "poorHealth", "poorPhyHealth", "poorMenHealth", "lowBWeight"];
+												var outcomes = ["ftEmployed", "ftGradSchool", "ptEmployed", "gapYear", "jobSearch"];
 
 												if ($.inArray(d, outcomes) != -1) // in the list
 													return Database.outcomeColour;
@@ -128,9 +128,9 @@ var DotPlot = {
 								var nodeCoord = ArcView.computeNodeCoordinates(ArcView.radius);
 
 								// remove all the highlights
-								ArcView.svg.selectAll(".state-node")
+								ArcView.svg.selectAll(".school-node")
 											.style("opacity", null);
-								ArcView.svg.selectAll(".state-label")
+								ArcView.svg.selectAll(".school-label")
 											.style("opacity", null)
 											.style("font-size", 7)
 											.attr("x", function(d) {
@@ -149,11 +149,11 @@ var DotPlot = {
 											.attr("cy", 0);
 
 								// remove the bars
-								ArcView.svg.selectAll(".state-bar")
+								ArcView.svg.selectAll(".school-bar")
 											.attr("height", 0);
 
 								// remove focalNode's highlight
-								ArcView.svg.selectAll(".state-node")
+								ArcView.svg.selectAll(".school-node")
 											.style("fill", "none")
 											.style("r", 3)
 											.attr("cx", function(d) {
@@ -165,23 +165,23 @@ var DotPlot = {
 												return nodeCoord[index].y;
 											});
 								if (ArcView.isTwo) {
-									ArcView.svg.selectAll(".outcome .state-label")
+									ArcView.svg.selectAll(".outcome .school-label")
 											.style("fill", Database.outcomeColour);
-									ArcView.svg.selectAll(".factor .state-label")
+									ArcView.svg.selectAll(".factor .school-label")
 											.style("fill", Database.factorColour);
 								}
 								else {
-									ArcView.svg.selectAll(".variable .state-label")
+									ArcView.svg.selectAll(".variable .school-label")
 												.style("fill", "#999999");
 								}
 							})
 							.on("click", function(d) {
-								var state = d[0][0].state;
-								SmallMultiples.create(state);
+								var school = d[0][0].school;
+								SmallMultiples.create(school);
 							});
 
 		// append rect for hovering
-		state.append("rect")
+		school.append("rect")
 				.attr("x", 0)
 				.attr("y", -yScale.rangeBand() / 2)
 				.attr("height", yScale.rangeBand())
@@ -189,16 +189,16 @@ var DotPlot = {
 				.attr("fill", "white")
 				.attr("opacity", 0.1);
 
-		// append group for state name and rankings
-		var nameRankingGroup = state.append("g");
+		// append group for school name and rankings
+		var nameRankingGroup = school.append("g");
 
-		// draw state names
+		// draw school names
 		nameRankingGroup.append("text")
 						.text(function(d) {
-							return d[0][0].state;
+							return d[0][0].school;
 						})
 						.attr("alignment-baseline", "central")
-						.attr("class", "stateName")
+						.attr("class", "schoolName")
 						.attr("x", 0)
 						.attr("y", 0);
 
@@ -311,8 +311,8 @@ var DotPlot = {
 				.text("Low")
 				.style("font-size", 10);
 
-		// change state
-		self.currentState = "bar";
+		// change school
+		self.currentSchool = "bar";
 		$("#init-dot-plot span").removeClass("ui-icon-minus")
 								.addClass("ui-icon-plus");
 		d3.select("#legend .instruction")
@@ -321,29 +321,29 @@ var DotPlot = {
 	initDotPlot: function() {
 		var self = this;
 
-		if (self.currentState == "dot") // just in case
+		if (self.currentSchool == "dot") // just in case
 			return;
-		else if (self.currentState == "bar") // changing from bar to dot
+		else if (self.currentSchool == "bar") // changing from bar to dot
 			self.svg.selectAll("*").remove();
 
 
 		var xScale = d3.scale.linear()
-								.domain([1,51])
+								.domain([1,47])
 								.range([100, self.width]);
 		var yScale = d3.scale.ordinal()
-								.domain(Database.state)
+								.domain(Database.school)
 								.rangeBands([0, self.height]);
 
-		// draw all the state groups
-		var state = self.svg.selectAll(".state")
+		// draw all the school groups
+		var school = self.svg.selectAll(".school")
 							.data(self.allRankings[Database.currentIndex])
 							.enter()
 							.append("g")
 							.attr("class", function(d) {
-								return d[0].state.split(' ').join('-') + " state";
+								return d[0].school.split(' ').join('-') + " school";
 							})
 							.attr("transform", function(d) {
-								return "translate(0, " + yScale(d[0].state) + ")";
+								return "translate(0, " + yScale(d[0].school) + ")";
 							})
 							.attr("cursor", "pointer")
 							.on("mouseenter", function(d, i) {
@@ -352,17 +352,17 @@ var DotPlot = {
 									.attr("fill", "#999999");
 
 								// show the user that some is high and some is low
-								var stateRankings = Database.data[Database.currentIndex][i]; // an object
-								for (key in stateRankings) {
-									if (stateRankings[key] <= 17) {
+								var schoolRankings = Database.data[Database.currentIndex][i]; // an object
+								for (key in schoolRankings) {
+									if (schoolRankings[key] <= 17) {
 										ArcView.svg.select("text." + key)
 													.style("fill", Database.highColour);
 									}
-									else if (stateRankings[key] > 17 && stateRankings[key] <= 34) {
+									else if (schoolRankings[key] > 17 && schoolRankings[key] <= 34) {
 										ArcView.svg.select("text." + key)
 													.style("fill", Database.moderateColour);
 									}
-									else if (stateRankings[key] > 34) {
+									else if (schoolRankings[key] > 34) {
 										ArcView.svg.select("text." + key)
 													.style("fill", Database.lowColour);
 									}
@@ -377,13 +377,13 @@ var DotPlot = {
 													.style("opacity", null);
 								}
 
-								// find common states
+								// find common schools
 								if (ArcView.isTwo) {
-									self.findCommonStates(stateRankings.abbr, "outcome");
-									self.findCommonStates(stateRankings.abbr, "factor");
+									self.findCommonSchools(schoolRankings.abbr, "outcome");
+									self.findCommonSchools(schoolRankings.abbr, "factor");
 								}
 								else {
-									self.findCommonStates(stateRankings.abbr, "variable");
+									self.findCommonSchools(schoolRankings.abbr, "variable");
 								}
 
 							})
@@ -415,9 +415,9 @@ var DotPlot = {
 								var nodeCoord = ArcView.computeNodeCoordinates(ArcView.radius);
 
 								// remove all the highlights
-								ArcView.svg.selectAll(".state-node")
+								ArcView.svg.selectAll(".school-node")
 											.style("opacity", null);
-								ArcView.svg.selectAll(".state-label")
+								ArcView.svg.selectAll(".school-label")
 											.style("opacity", null)
 											.style("font-size", 7)
 											.attr("x", function(d) {
@@ -436,11 +436,11 @@ var DotPlot = {
 											.attr("cy", 0);
 
 								// remove the bars
-								ArcView.svg.selectAll(".state-bar")
+								ArcView.svg.selectAll(".school-bar")
 											.attr("height", 0);
 
 								// remove focalNode's highlight
-								ArcView.svg.selectAll(".state-node")
+								ArcView.svg.selectAll(".school-node")
 											.style("fill", "none")
 											.style("r", 3)
 											.attr("cx", function(d) {
@@ -452,23 +452,23 @@ var DotPlot = {
 												return nodeCoord[index].y;
 											});
 								if (ArcView.isTwo) {
-									ArcView.svg.selectAll(".outcome .state-label")
+									ArcView.svg.selectAll(".outcome .school-label")
 											.style("fill", Database.outcomeColour);
-									ArcView.svg.selectAll(".factor .state-label")
+									ArcView.svg.selectAll(".factor .school-label")
 											.style("fill", Database.factorColour);
 								}
 								else {
-									ArcView.svg.selectAll(".variable .state-label")
+									ArcView.svg.selectAll(".variable .school-label")
 												.style("fill", "#999999");
 								}
 							})
 							.on("click", function(d) {
-								var state = d[0].state;
-								SmallMultiples.create(state);
+								var school = d[0].school;
+								SmallMultiples.create(school);
 							});
 
 		// append rect for hovering
-		state.append("rect")
+		school.append("rect")
 				.attr("x", 0)
 				.attr("y", -yScale.rangeBand() / 2)
 				.attr("height", yScale.rangeBand())
@@ -476,17 +476,17 @@ var DotPlot = {
 				.attr("fill", "white")
 				.attr("opacity", 0.1);
 
-		// append group for state name and rankings
-		var nameRankingGroup = state.append("g");
+		// append group for school name and rankings
+		var nameRankingGroup = school.append("g");
 
-		// draw state names
+		// draw sschool names
 		nameRankingGroup.append("text")
 						.text(function(d) {
-							return d[0].state;
+							return d[0].school;
 						})
 						.attr("alignment-baseline", "central")
 						.attr("class", function(d) {
-							return "stateName";
+							return "schoolName";
 						})
 						.attr("x", 0)
 						.attr("y", 0);
@@ -563,8 +563,8 @@ var DotPlot = {
 					.text("Bad")
 					.style("font-size", 10);
 
-		// change state
-		self.currentState = "dot";
+		// change school
+		self.currentSchool = "dot";
 		$("#init-dot-plot span").removeClass("ui-icon-plus")
 								.addClass("ui-icon-minus");
 		d3.select("#legend .instruction")
@@ -574,41 +574,41 @@ var DotPlot = {
 	update: function(index) {
 		var self = this;
 
-		if (self.currentState == "bar")
+		if (self.currentSchool == "bar")
 			self.updateBarChart(index);
-		else if (self.currentState == "dot")
+		else if (self.currentSchool == "dot")
 			self.updateDotPlot(index);
 	},
 	updateDotPlot: function(index) {
 		var self = this;
 
 		var xScale = d3.scale.linear()
-								.domain([1,51])
+								.domain([1,47])
 								.range([100, self.width]);
 		var yScale = d3.scale.ordinal()
-								.domain(Database.state)
+								.domain(Database.school)
 								.rangeBands([0, self.height]);
 
-		// draw all the state groups
-		var state = self.svg.selectAll(".state")
+		// draw all the school groups
+		var school = self.svg.selectAll(".school")
 							.data(self.allRankings[index])
 							.attr("class", function(d) {
-								return d[0].state.split(' ').join('-') + " state";
+								return d[0].school.split(' ').join('-') + " school";
 							})
 							.attr("transform", function(d) {
-								return "translate(0, " + yScale(d[0].state) + ")";
+								return "translate(0, " + yScale(d[0].school) + ")";
 							});
 
 		// get name and ranking group
-		var nameRankingGroup = state.select("g");
+		var nameRankingGroup = school.select("g");
 
-		// draw state names
+		// draw school names
 		nameRankingGroup.select("text")
 						.text(function(d) {
-							return d[0].state;
+							return d[0].school;
 						})
 						.attr("class", function(d) {
-							return "stateName";
+							return "schoolName";
 						});
 
 		// draw the group of dots
@@ -634,26 +634,26 @@ var DotPlot = {
 		var self = this;
 
 		var yScale = d3.scale.ordinal()
-								.domain(Database.state)
+								.domain(Database.school)
 								.rangeBands([0, self.height]);
 
-		// update state group
-		var state = self.svg.selectAll(".state")
+		// update school group
+		var school = self.svg.selectAll(".school")
 							.data(self.summaryRankings[index])
 							.attr("class", function(d) {
-								return d[0][0].state.split(' ').join('-') + " state";
+								return d[0][0].school.split(' ').join('-') + " school";
 							})
 							.attr("transform", function(d) {
-								return "translate(0, " + yScale(d[0][0].state) + ")";
+								return "translate(0, " + yScale(d[0][0].school) + ")";
 							});
 
 		// select the group inside
-		var nameRankingGroup = state.select("g")
+		var nameRankingGroup = school.select("g")
 									
-		// select state names
+		// select schools names
 		nameRankingGroup.select("text")
 						.text(function(d) {
-							return d[0][0].state;
+							return d[0][0].school;
 						});
 
 		// update the group of bars
@@ -696,35 +696,35 @@ var DotPlot = {
 	extractRankings: function() {
 		var self = this;
 
-		var outcomes = ["premDeath", "poorHealth", "poorPhyHealth", "poorMenHealth", "lowBWeight"];
+		var outcomes = ["ftEmployed", "ftGradSchool", "ptEmployed", "gapYear", "jobSearch"];
 
 		for (var i = 0; i < 4; i++) {
-			$.map(Database.data[i], function(stateData, index) { // loop for each state
-				var stateRankings = []; // an array of rankingObj for a state
+			$.map(Database.data[i], function(schoolData, index) { // loop for each school
+				var schoolRankings = []; // an array of rankingObj for a school
 
-	    		$.map(stateData, function(value, key) { // loop for each ranking of a state
-	    			if (key != "state" && key != "abbr") {
+	    		$.map(schoolData, function(value, key) { // loop for each ranking of a school
+	    			if (key != "school" && key != "abbr") {
 	    				var rankingObj = {
 		    				ranking: 0,
 		    				variable: null,
 		    				isFactor: null,
-		    				state: null
+		    				school: null
 	    				};
 
 	    				// storing the value of rankingObj   d
 	    				rankingObj.ranking = value;
 	    				rankingObj.variable = key;
-	    				rankingObj.state = stateData.state;
+	    				rankingObj.school = schoolData.school;
 		    			if ($.inArray(key, outcomes) != -1) // if the key is an outcome
 		    				rankingObj.isFactor = false;
 		    			else// if it is an outcome variable
 		    				rankingObj.isFactor = true;
 
-	    				stateRankings.push(rankingObj);
+	    				schoolRankings.push(rankingObj);
 	    			}
 	    		});
 
-	    		self.allRankings[i].push(stateRankings);
+	    		self.allRankings[i].push(schoolRankings);
 			});
 		}
 	},
@@ -733,79 +733,79 @@ var DotPlot = {
 
 		var outcomes = ["premDeath", "poorHealth", "poorPhyHealth", "poorMenHealth", "lowBWeight"];
 		for (var i = 0; i < 4; i++) {
-			$.map(Database.data[i], function(stateData, index) { // loop for each state
-				// 0: high, 1: medium, 2: low rankings for a state
+			$.map(Database.data[i], function(schoolData, index) { // loop for each school
+				// 0: high, 1: medium, 2: low rankings for a school
 				// 0: factor, 1: outcome
-				var stateBarChart = [
+				var schoolBarChart = [
 					[
 						{
 							isFactor: true,
-							state: stateData.state,
+							school: schoolData.school,
 							count: 0
 						},
 						{
 							isFactor: false,
-							state: stateData.state,
+							school: schoolData.school,
 							count: 0
 						}
 					],
 					[
 						{
 							isFactor: true,
-							state: stateData.state,
+							school: schoolData.school,
 							count: 0
 						},
 						{
 							isFactor: false,
-							state: stateData.state,
+							school: schoolData.school,
 							count: 0
 						}
 					],
 					[
 						{
 							isFactor: true,
-							state: stateData.state,
+							school: schoolData.school,
 							count: 0
 						},
 						{
 							isFactor: false,
-							state: stateData.state,
+							school: schoolData.school,
 							count: 0
 						}
 					]
 				];
 
 				// count number in each bin
-				for (key in stateData) {
-					if (key != "state" && key != "abbr") {
+				for (key in schoolData) {
+					if (key != "school" && key != "abbr") {
 						if ($.inArray(key, outcomes) != -1) { // outcome
-							if (stateData[key] <= 17) // low
-								stateBarChart[0][1].count++;
-							else if (stateData[key] > 17 && stateData[key] <= 34) // medium
-								stateBarChart[1][1].count++;
-							else if (stateData[key] > 34) // high
-								stateBarChart[2][1].count++;
+							if (schoolData[key] <= 17) // low
+								schoolBarChart[0][1].count++;
+							else if (schoolData[key] > 17 && schoolData[key] <= 34) // medium
+								schoolBarChart[1][1].count++;
+							else if (schoolData[key] > 34) // high
+								schoolBarChart[2][1].count++;
 						}
 		    			else { // factor
-		    				if (stateData[key] <= 17) // low
-								stateBarChart[0][0].count++;
-							else if (stateData[key] > 17 && stateData[key] <= 34) // medium
-								stateBarChart[1][0].count++;
-							else if (stateData[key] > 34) // high
-								stateBarChart[2][0].count++;
+		    				if (schoolData[key] <= 17) // low
+								schoolBarChart[0][0].count++;
+							else if (schoolData[key] > 17 && schoolData[key] <= 34) // medium
+								schoolBarChart[1][0].count++;
+							else if (schoolData[key] > 34) // high
+								schoolBarChart[2][0].count++;
 		    			}
 					}
 				}
 
 				// push to corr array
-				self.summaryRankings[i].push(stateBarChart);
+				self.summaryRankings[i].push(schoolBarChart);
 			});
 		}
 	},
 	sort: function(varName) {
 		var self = this;
 
-		if (self.currentState == "bar") {
+		if (self.currentSchool == "bar") {
 			self.needRestore = true; // if dot, no need, else needed
 			self.initDotPlot();
 		}
@@ -816,33 +816,33 @@ var DotPlot = {
 		// extract the data you want
 		var extractedData = [];
 
-		$.map(Database.data[Database.currentIndex], function(stateData, index) { // loop for each state
-			var stateExtractedData = {
-				state: stateData.state,
-				ranking: stateData[varName]
+		$.map(Database.data[Database.currentIndex], function(schoolData, index) { // loop for each school
+			var schoolExtractedData = {
+				school: schoolData.school,
+				ranking: schoolData[varName]
 			};
 
-			extractedData.push(stateExtractedData);
+			extractedData.push(schoolExtractedData);
 		});
 
-		// sort them and extract the list of ordered states
-		var sortedStates = [];
+		// sort them and extract the list of ordered schools
+		var sortedSchools = [];
 		extractedData.sort(function(a, b) {
 			return a.ranking - b.ranking;
 		});
 		$.map(extractedData, function(d, index) {
-			sortedStates.push(d.state);
+			sortedSchools.push(d.school);
 		});
 
 		// sort the visual elements
 		var yScale = d3.scale.ordinal()
-								.domain(sortedStates)
+								.domain(sortedSchools)
 								.rangeBands([0, self.height]);
-		for (var i = 0; i < sortedStates.length; i++) {
-			d3.selectAll("." + sortedStates[i].split(' ').join('-'))
+		for (var i = 0; i < sortedSchools.length; i++) {
+			d3.selectAll("." + sortedSchools[i].split(' ').join('-'))
 				.transition()
 				.attr("transform", function(d) {
-					return "translate(0, " + yScale(sortedStates[i]) + ")";
+					return "translate(0, " + yScale(sortedSchools[i]) + ")";
 				})
 		}
 
@@ -859,14 +859,14 @@ var DotPlot = {
 
 		if (!self.needRestore) { // previously is a dot plot
 			var yScale = d3.scale.ordinal()
-								.domain(Database.state)
+								.domain(Database.school)
 								.rangeBands([0, self.height]);
 
-			for (var i = 0; i < Database.state.length; i++) {
-				d3.selectAll("." + Database.state[i].split(' ').join('-'))
+			for (var i = 0; i < Database.school.length; i++) {
+				d3.selectAll("." + Database.school[i].split(' ').join('-'))
 					.transition()
 					.attr("transform", function(d) {
-						return "translate(0, " + yScale(Database.state[i]) + ")";
+						return "translate(0, " + yScale(Database.school[i]) + ")";
 					});
 			}
 
@@ -919,10 +919,10 @@ var DotPlot = {
 			.attr("text-anchor", "end")
 			.text("Click to see details →");
 	},
-	findCommonStates: function(state, circleName) {
+	findCommonSchools: function(school, circleName) {
 		var self = this;
-		var commonStates = [];
-		var stateCount = {};
+		var commonSchools = [];
+		var schoolCount = {};
 		var chosenVariables = [];
 
 		if (circleName == "factor")
@@ -937,34 +937,34 @@ var DotPlot = {
 
 		// init the vector
 		for (i in Database.abbr) {
-			stateCount[Database.abbr[i]] = 0;
+			schoolCount[Database.abbr[i]] = 0;
 		}
 
-		// finding common states in terms of factor
-		var currentStates = [];
-		var foundStates = [];
-		$.extend(true, currentStates, Database.abbr); // create a deep copy of abbr
+		// finding common schools in terms of factor
+		var currentSchools = [];
+		var foundSchools = [];
+		$.extend(true, currentSchools, Database.abbr); // create a deep copy of abbr
 		for (i in chosenVariables) {
 			var variable = chosenVariables[i];
-			var HML = Database.HMLdata[Database.currentIndex][state][variable]; // H, M, L for a variable for a state
+			var HML = Database.HMLdata[Database.currentIndex][school][variable]; // H, M, L for a variable for a school
 
-			for (j in currentStates) {
-				var currentState = currentStates[j];
-				var stateData = Database.HMLdata[Database.currentIndex][currentState];
-				if (stateData[variable] == HML) {
-					foundStates.push(stateData["abbr"])
-					stateCount[stateData["abbr"]]++;
+			for (j in currentSchools) {
+				var currentSchool = currentSchools[j];
+				var schoolData = Database.HMLdata[Database.currentIndex][currentSchool];
+				if (schoolData[variable] == HML) {
+					foundSchools.push(schoolData["abbr"])
+					schoolCount[schoolData["abbr"]]++;
 				}
 			}
 
-			currentStates = foundStates;
-			foundStates = [];
+			currentSchools = foundSchools;
+			foundSchools = [];
 		}
-		commonStates = currentStates;
+		commonSchools = currentSchools;
 
-		if (commonStates.length != 0) {
-			ArcView.highlight(commonStates, state, circleName);
-			ArcView.moveFocalNode(stateCount, circleName);
+		if (commonSchools.length != 0) {
+			ArcView.highlight(commonSchools, school, circleName);
+			ArcView.moveFocalNode(schoolCount, circleName);
 		}
 	}
 }

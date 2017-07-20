@@ -26,15 +26,15 @@ var ArcView = {
 						.append("g")
 						.attr("transform", "translate(" + self.margin.left + ", " + self.margin.top + ")");
 
-		self.createCircle("Health Factors");
-		self.createCircle("Health Outcomes");
+		self.createCircle("Career Drivers");
+		self.createCircle("Career Outcomes");
 		self.createVarNameList();
 		self.createYearSelect();
 		self.drawInstructions();
 	},
 	computeNodeCoordinates: function(radius) {
 		var self = this;
-		var numOfNodes = 51; // including the focal node
+		var numOfNodes = 47; // including the focal node
 		var angleInterval = Math.PI * 2 / numOfNodes;
 		var startingAngle = Math.PI / 2;
 		var coord = [];
@@ -49,25 +49,25 @@ var ArcView = {
 
 		return coord;
 	},
-	createCircle: function(type) { // layout 52 nodes on a circle
+	createCircle: function(type) { // layout 48 nodes on a circle
 		var self = this;
 		var nodeCoord = self.computeNodeCoordinates(self.radius);
 		var textCoord = self.computeNodeCoordinates(self.radius + 10);
 		var circleGroup, colour;
 
-		if (type == "Health Factors") {
+		if (type == "Career Drivers") {
 			circleGroup = self.svg.append("g")
 									.attr("class", "factor")
 									.attr("transform", "translate(328, 145)");
 			colour = Database.factorColour
 		}
-		else if (type == "Health Outcomes") {
+		else if (type == "Career Outcomes") {
 			circleGroup = self.svg.append("g")
 									.attr("class", "outcome")
 									.attr("transform", "translate(633, 145)");
 			colour = Database.outcomeColour;
 		}
-		else if (type == "Health Variables") {
+		else if (type == "Career Variables") {
 			circleGroup = self.svg.append("g")
 									.attr("class", "variable")
 									.attr("transform", "translate(480, 145)");
@@ -82,12 +82,12 @@ var ArcView = {
 					.attr("cx", 0)
 					.attr("cy", 0);
 
-		circleGroup.selectAll(".state-node")
-					.data(Database.stateByRegions)
+		circleGroup.selectAll(".school-node")
+					.data(Database.schoolByRegions)
 					.enter()
 					.append("circle")
 					.attr("class", function(d) {
-						return d.abbr + " state-node";
+						return d.abbr + " school-node";
 					})
 					.attr("data-class", function(d, i) {
 						return i;
@@ -103,13 +103,13 @@ var ArcView = {
 					.attr("stroke", colour)
 					.attr("stroke-width", 1);
 
-		// draw state labels
-		circleGroup.selectAll(".state-label")
-					.data(Database.stateByRegions)
+		// draw school labels
+		circleGroup.selectAll(".school-label")
+					.data(Database.schoolByRegions)
 					.enter()
 					.append("text")
 					.attr("class", function(d) {
-						return d.abbr + " state-label";
+						return d.abbr + " school-label";
 					})
 					.attr("data-class", function(d, i) {
 						return i;
@@ -140,13 +140,13 @@ var ArcView = {
 		// draw inner arcs
 		var startAngle = Math.PI;
 		var anglePadding = Math.PI / 36;
-		var availableAngle  = Math.PI * 2 - anglePadding * 4; // 4 regions
-		for (var i = 0; i < Database.numberOfStatesByRegions.length; i++) {
-			var angleDiff = Database.numberOfStatesByRegions[i] / 51 * availableAngle;
+		var availableAngle  = Math.PI * 2 - anglePadding * 7; // 7 regions
+		for (var i = 0; i < Database.numberOfSchoolsByRegions.length; i++) {
+			var angleDiff = Database.numberOfSschoolsByRegions[i] / 47 * availableAngle;
 			var offset = "75%";
 			var textInnerRadius = 100, textOuterRadius = 110;
 
-			if (Database.regions[i] == "West" || Database.regions[i] == "Northeast") {
+			if (Database.regions[i] == "Far West" || Database.regions[i] == "New England") {
 		    	offset = "25%"
 		    	textInnerRadius = 85;
 		    	textOuterRadius = 95;
@@ -187,12 +187,12 @@ var ArcView = {
 		}
 
 		// draw bar charts
-		circleGroup.selectAll(".state-bar")
-					.data(Database.stateByRegions)
+		circleGroup.selectAll(".school-bar")
+					.data(Database.schoolByRegions)
 					.enter()
 					.append("rect")
 					.attr("class", function(d) {
-						return d.abbr + " state-bar";
+						return d.abbr + " school-bar";
 					})
 					.attr("x", 0)
 					.attr("y", 0)
@@ -252,7 +252,7 @@ var ArcView = {
 									})
 									.on("click", function() {
 										var variableSelected = d3.select(this).data()[0];
-										var outcomes = ["premDeath", "poorHealth", "poorPhyHealth", "poorMenHealth", "lowBWeight"];
+										var outcomes = ["ftEmployed", "ftGradSchool", "ptEmployed", "gapYear", "jobSearch"];
 										var isOutcome = false;
 										if ($.inArray(variableSelected, outcomes) != -1)
 											isOutcome = true;
@@ -346,7 +346,7 @@ var ArcView = {
 						return d;
 					})
 					.style("fill", function(d) {
-						var outcomes = ["premDeath", "poorHealth", "poorPhyHealth", "poorMenHealth", "lowBWeight"];
+						var outcomes = ["ftEmployed", "ftGradSchool", "ptEmployed", "gapYear", "jobSearch"];
 
 						if ($.inArray(d, outcomes) != -1) // in the list
 							return Database.outcomeColour;
@@ -367,7 +367,7 @@ var ArcView = {
 					.attr("cy", 0)
 					.attr("stroke-width", 1)
 					.attr("stroke", function(d) {
-						var outcomes = ["premDeath", "poorHealth", "poorPhyHealth", "poorMenHealth", "lowBWeight"];
+						var outcomes = ["ftEmployed", "ftGradSchool", "ptEmployed", "gapYear", "jobSearch"];
 
 						if ($.inArray(d, outcomes) != -1) // in the list
 							return Database.outcomeColour;
@@ -411,7 +411,7 @@ var ArcView = {
 							nameGroup.selectAll("circle")
 										.style("fill", function() {
 											var variableSelected = d3.select(this).data()[0];
-											var outcomes = ["premDeath", "poorHealth", "poorPhyHealth", "poorMenHealth", "lowBWeight"];
+											var outcomes = ["ftEmployed", "ftGradSchool", "ptEmployed", "gapYear", "jobSearch"];
 											var isOutcome = false;
 											if ($.inArray(variableSelected, outcomes) != -1)
 												isOutcome = true;
@@ -424,7 +424,7 @@ var ArcView = {
 										});
 
 							// add variables to the lists
-							var outcomes = ["premDeath", "poorHealth", "poorPhyHealth", "poorMenHealth", "lowBWeight"];
+							var outcomes = ["ftEmployed", "ftGradSchool", "ptEmployed", "gapYear", "jobSearch"];
 							self.chosenVariables = [];
 							self.chosenFactors = [];
 							self.chosenOutcomes = [];
@@ -556,7 +556,7 @@ var ArcView = {
 			.attr("y2", 10)
 			.style("opacity", 0.1);
 
-		d3.select("#year-select")
+		/* d3.select("#year-select")
 			.append("text")
 			.text("2016")
 			.attr("alignment-baseline", "central")
@@ -573,7 +573,7 @@ var ArcView = {
 					.style("opacity", 1);
 
 				Database.update(2016, 3);
-			});
+			});*/
 
 		// some instruction again
 		d3.select("#year-select")
@@ -592,18 +592,18 @@ var ArcView = {
 					.attr("class", "instruction")
 					.attr("x", self.margin.left)
 					.attr("y", self.height - 20) 
-					.text("1. Select health factors and outcomes. \xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0" + 
-						  "\xa0\xa0\xa0\xa0\xa0 2. Hover on a state. \xa0\xa0\xa0\xa0\xa0\xa0\xa0" + 
-						  "\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa03. A state is highlighted if it is similar to the " +
-						  "selected state in terms of the selected variables.");
+					.text("1. Select career drivers and outcomes. \xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0" + 
+						  "\xa0\xa0\xa0\xa0\xa0 2. Hover on a school. \xa0\xa0\xa0\xa0\xa0\xa0\xa0" + 
+						  "\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa03. A school is highlighted if it is similar to the " +
+						  "selected school in terms of the selected variables.");
 
 		self.svg.append("text")
 					.attr("class", "instruction")
 					.attr("x", self.margin.left)
 					.attr("y", self.height - 5)
-					.text("4. The center circle is attracted towards the similar states and the bar charts inside indicates how similar a state is to the hovered state");
+					.text("4. The center circle is attracted towards the similar schools and the bar charts indicate similarity");
 	},
-	highlight: function(states, focalState, circleName) {
+	highlight: function(schools, focalSchool, circleName) {
 		var self = this;
 		var colour = ""
 		var textCoord = self.computeNodeCoordinates(self.radius + 15);
@@ -616,17 +616,17 @@ var ArcView = {
 			colour = "#999999";
 
 		// change nodes and labels to highlight
-		self.svg.selectAll("." + circleName + " .state-node")
+		self.svg.selectAll("." + circleName + " .school-node")
 				.style("opacity", 0.1);
-		self.svg.selectAll("." + circleName + " .state-label")
+		self.svg.selectAll("." + circleName + " .school-label")
 				.style("opacity", 0.1);
-		self.svg.selectAll("." + circleName + " .state-label")
+		self.svg.selectAll("." + circleName + " .school-label")
 			.style("font-size", 7);
 
-		for (i in states) {
-			self.svg.selectAll("." + circleName + " ." + states[i])
+		for (i in schools) {
+			self.svg.selectAll("." + circleName + " ." + schools[i])
 					.style("opacity", null);
-			self.svg.selectAll("." + circleName + " .state-label." + states[i])
+			self.svg.selectAll("." + circleName + " .school-label." + schools[i])
 					.style("font-size", 10)
 					.attr("x", function(d) {
 						var index = parseInt(d3.select(this).attr("data-class"))
@@ -638,55 +638,55 @@ var ArcView = {
 					});
 		}
 
-		// highlight the focal state
-		var numOfNodes = 51; // including the focal node
+		// highlight the focal school
+		var numOfNodes = 47; // including the focal node
 		var angleInterval = Math.PI * 2 / numOfNodes;
 		var startingAngle = Math.PI / 2;
-		var i = parseInt(self.svg.selectAll("." + circleName + " .state-label." + focalState).attr("data-class"));
+		var i = parseInt(self.svg.selectAll("." + circleName + " .school-label." + focalSchool).attr("data-class"));
 		var currentAngle = startingAngle + i * angleInterval;
 		var nodeX = (self.radius + 15) * Math.cos(currentAngle);
 		var nodeY = (self.radius + 15) * Math.sin(currentAngle);
 
-		self.svg.selectAll("." + circleName + " .state-node." + focalState)
+		self.svg.selectAll("." + circleName + " .school-node." + focalSchool)
 					.style("fill", colour)
 					.style("r", 9)
 					.attr("cx", nodeX)
 					.attr("cy", nodeY);
-		self.svg.selectAll("." + circleName + " .state-label." + focalState)
+		self.svg.selectAll("." + circleName + " .school-label." + focalSchool)
 					.style("fill", "white");
 	},
-	moveFocalNode: function(stateCount, circleName) { // using VIBE layout algorithm to find the new pos
+	moveFocalNode: function(schoolCount, circleName) { // using VIBE layout algorithm to find the new pos
 		var self = this;
 		var POI = [{ x: 0, y: 0, weight: null }]; // the centre is also one POI
 		var barCoord = self.computeNodeCoordinates(self.radius - 18);
 
-		// extract coordinates of all the states
+		// extract coordinates of all the schools
 		var maxWeight = 0;
-		for (state in stateCount) {
+		for (school in schoolCount) {
 			var coord = { x: null, y: null, weight: null };
 
-			coord.x = parseFloat(self.svg.selectAll("." + circleName + " .state-node." + state).attr("cx"));
-			coord.y = parseFloat(self.svg.selectAll("." + circleName + " .state-node." + state).attr("cy"));
-			coord.weight = stateCount[state];
+			coord.x = parseFloat(self.svg.selectAll("." + circleName + " .school-node." + school).attr("cx"));
+			coord.y = parseFloat(self.svg.selectAll("." + circleName + " .school-node." + school).attr("cy"));
+			coord.weight = schoolCount[school];
 
-			if (stateCount[state] > maxWeight)
-				maxWeight = stateCount[state];
+			if (schoolCount[school] > maxWeight)
+				maxWeight = schoolCount[school];
 
 			POI.push(coord);
 		}
 
-		// update state-bar
+		// update school-bar
 		var barScale = d3.scale.linear()
 							.domain([0, maxWeight])
 							.range([5, 15]);
 
-		self.svg.selectAll("." + circleName + " .state-bar")
+		self.svg.selectAll("." + circleName + " .school-bar")
 				.attr("height", function(d) {
-					return barScale(stateCount[d.abbr]);
+					return barScale(schoolCount[d.abbr]);
 				})
 				.attr("transform", function(d, i) {
-					var angle = i * 360 / 51;
-					var yShift = 8 - barScale(stateCount[d.abbr]);
+					var angle = i * 360 / 47;
+					var yShift = 8 - barScale(schoolCount[d.abbr]);
 					return "translate(" + barCoord[i].x + ", " + barCoord[i].y + ") " + "rotate(" + angle + ") " + "translate(" + (-self.barWidth / 2) + "," + yShift + ")";
 				});;
 
@@ -726,9 +726,9 @@ var ArcView = {
 		self.svg.select(".outcome").remove();
 		self.svg.select(".factor").remove();
 
-		self.createCircle("Health Variables");
+		self.createCircle("Career Variables");
 
-		// change state
+		// change school
 		self.isTwo = false;
 		d3.select("#year-select .instruction")
 			.text("Click to split the circle into factors and outcomes →");
@@ -738,10 +738,10 @@ var ArcView = {
 
 		self.svg.select(".variable").remove();
 
-		self.createCircle("Health Factors");
-		self.createCircle("Health Outcomes");
+		self.createCircle("Career Drivers");
+		self.createCircle("Career Outcomes");
 
-		// change state
+		// change school
 		self.isTwo = true;
 		d3.select("#year-select .instruction")
 			.text("Click to combine the two circles →");
