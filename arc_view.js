@@ -638,7 +638,7 @@ var ArcView = {
 					});
 		}
 
-		// highlight the focal state
+		// highlight the focal school
 		var numOfNodes = 47; // including the focal node
 		var angleInterval = Math.PI * 2 / numOfNodes;
 		var startingAngle = Math.PI / 2;
@@ -667,7 +667,7 @@ var ArcView = {
 
 			coord.x = parseFloat(self.svg.selectAll("." + circleName + " .school-node." + school).attr("cx"));
 			coord.y = parseFloat(self.svg.selectAll("." + circleName + " .school-node." + school).attr("cy"));
-			coord.weight = stateCount[state];
+			coord.weight = schoolCount[school];
 
 			if (schoolCount[school] > maxWeight)
 				maxWeight = schoolCount[school];
@@ -675,7 +675,7 @@ var ArcView = {
 			POI.push(coord);
 		}
 
-		// update state-bar
+		// update school-bar
 		var barScale = d3.scale.linear()
 							.domain([0, maxWeight])
 							.range([5, 15]);
@@ -728,7 +728,7 @@ var ArcView = {
 
 		self.createCircle("Career Variables");
 
-		// change state
+		// change school
 		self.isTwo = false;
 		d3.select("#year-select .instruction")
 			.text("Click to split the circle into factors and outcomes →");
@@ -741,7 +741,7 @@ var ArcView = {
 		self.createCircle("Career Drivers");
 		self.createCircle("Career Outcomes");
 
-		// change state
+		// change school
 		self.isTwo = true;
 		d3.select("#year-select .instruction")
 			.text("Click to combine the two circles →");
