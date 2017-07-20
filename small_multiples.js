@@ -49,9 +49,9 @@ var SmallMultiples = {
                 if (schoolData.school == school){
                     for (var key in schoolData){
                         value = schoolData[key];
-                        clean_data.forEach(function(stateData) {
-                            if (stateData.varName == key)
-                                stateData.value[i] = value;
+                        clean_data.forEach(function(schoolData) {
+                            if (schoolData.varName == key)
+                                schoolData.value[i] = value;
                         });
                     }
                 }
@@ -167,15 +167,15 @@ var SmallMultiples = {
                         return Database.varNameDict[d.varName];
                     });
 
-        // update state on the toolbar
-        d3.select("#current-state text")
-            .text("Temporal Trends of " + state);
+        // update school on the toolbar
+        d3.select("#current-school text")
+            .text("Temporal Trends of " + school);
 	},
     clear: function() {
         var self = this;
 
         self.svg.selectAll("*").remove();
         d3.select("#current-school text")
-            .text("Click on a state to see its detailed temporal trend.");
+            .text("Click on a school to see its detailed temporal trend.");
     }
 }
