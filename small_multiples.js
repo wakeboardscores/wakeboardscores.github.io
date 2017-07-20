@@ -8,8 +8,8 @@ var SmallMultiples = {
 
         var self = this;
 
-        //default school is....
-        self.school = school;
+        //default state is Georgia
+        self.state = state;
 
         self.width = viewWidth - self.margin.left - self.margin.right;
         self.height = viewHeight - self.margin.top - self.margin.bottom;
@@ -21,18 +21,18 @@ var SmallMultiples = {
                     .attr("transform", "translate(" + self.margin.left + ", " + self.margin.top + ")");
 
         // draw small multiples
-        d3.select("#current-school")
+        d3.select("#current-state")
             .append("text")
             .attr("x", 10)
             .attr("y", 10)
             .attr("alignment-baseline", "central")
             .attr("fill", "black")
-            .text("Click on a school to see its detailed temporal trend.");
+            .text("Click on a state to see its detailed temporal trend.");
     },
-    create: function(school) {
+    create: function(state) {
         var self = this;
         var clean_data = [];
-        var year = [2013, 2014, 2015];
+        var year = [2013, 2014, 2015, 2016];
 
         // set up the data in following format:
         // {key: var1, value: [rank2013, rank2014,...}
@@ -45,13 +45,13 @@ var SmallMultiples = {
         }
 
         Database.data.forEach(function(yearData, i) {
-            yearData.forEach(function(schoolData) {
-                if (schoolData.school == school){
-                    for (var key in schoolData){
-                        value = schoolData[key];
-                        clean_data.forEach(function(schoolData) {
-                            if (schoolData.varName == key)
-                                schoolData.value[i] = value;
+            yearData.forEach(function(stateData) {
+                if (stateData.state == state){
+                    for (var key in stateData){
+                        value = stateData[key];
+                        clean_data.forEach(function(stateData) {
+                            if (stateData.varName == key)
+                                stateData.value[i] = value;
                         });
                     }
                 }
@@ -62,7 +62,7 @@ var SmallMultiples = {
             if (i < 5)
                 d.type = "outcome"
             else
-                d.type = "driver"
+                d.type = "factor"
         });
 
         // used for position of each multiple
@@ -167,15 +167,15 @@ var SmallMultiples = {
                         return Database.varNameDict[d.varName];
                     });
 
-        // update school on the toolbar
-        d3.select("#current-school text")
-            .text("Temporal Trends of " + school);
+        // update state on the toolbar
+        d3.select("#current-state text")
+            .text("Temporal Trends of " + state);
 	},
     clear: function() {
         var self = this;
 
         self.svg.selectAll("*").remove();
-        d3.select("#current-school text")
-            .text("Click on a school to see its detailed temporal trend.");
+        d3.select("#current-state text")
+            .text("Click on a state to see its detailed temporal trend.");
     }
 }
