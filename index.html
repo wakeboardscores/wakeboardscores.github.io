@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+	<link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/jquery.tipsy/1.0.3/jquery.tipsy.min.css">
+
+	<script src="//d3js.org/d3.v3.min.js"></script>
+	<script   src="//code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+	<script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+
+	<style>
+		body {
+			font-family: "Trebuchet MS", "Helvetica", "Arial",  "Verdana", "sans-serif";
+			overflow: hidden;
+		}
+
+		.axis path,
+		.axis line {
+		  fill: none;
+		  stroke: #D3D3D3;
+		  shape-rendering: crispEdges;
+		}
+
+		.axis text {
+		  fill: #999999;
+		  font-size: 7px;
+		}
+
+		svg {
+		  font: 10px sans-serif;
+		}
+
+		div.noselection {
+			-webkit-user-select: none;
+		    -moz-user-select: none;
+		    -khtml-user-select: none;
+		    -ms-user-select: none;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="content">
+		<div id="left">
+			<div class="toolbar ui-widget-content ui-corner-all noselection">
+				<svg id="legend"></svg>
+				<span style="float:right;line-height:15px">
+					<button id="init-dot-plot" class="ui-button" style="padding:0px;margin:0px;">
+						<span class="ui-icon-plus ui-icon"></span>
+					</button>
+				</span>
+			</div>
+			<div id="dot-plot"></div>
+		</div>
+
+		<div id="right">
+			<div class="toolbar ui-widget-content ui-corner-all noselection">
+				<svg id="year-select"></svg>
+				<span style="float:right;line-height:15px">
+					<button id="combine-circles" class="ui-button" style="padding:0px;margin:0px;">
+						<span class="ui-icon-arrow-4-diag ui-icon"></span>
+					</button>
+				</span>
+			</div>
+			<div id="arc-view"></div>
+
+			<div class="toolbar ui-widget-content ui-corner-all noselection">
+				<svg id="current-state"></svg>
+				<span style="float:right;line-height:15px">
+					<button id="clear-small-multiples" class="ui-button" style="padding:0px;margin:0px;">
+						<span class="ui-icon-closethick ui-icon"></span>
+					</button>
+				</span>
+			</div>
+			<div id="small-multiples"></div>
+		</div>
+	</div>
+
+	<script src="dot_plot.js"></script>
+	<script src="small_multiples.js"></script>
+	<script src="arc_view.js"></script>
+	<script src="database.js"></script>
+	<script src="start.js"></script>
+</body>
