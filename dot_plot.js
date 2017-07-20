@@ -4,10 +4,10 @@ var DotPlot = {
 	margin: {top: 30, right: 10, bottom: 0, left: 10},
 	svg: null,
 
-	allRankings: [[], [], [], []], // allRankings[0] = 2013 ... allRankings[3] = 2016
-	summaryRankings: [[], [], [], []],
+	allRankings: [[], [], []], // allRankings[0] = 2013 ... allRankings[2] = 2015
+	summaryRankings: [[], [], []],
 
-	currentState: "",
+	currentSchool: "",
 	needRestore: false, // if it is a bar chart and the user wants to sort, restore is needed
 		
 	init: function(viewWidth, viewHeight) {
@@ -31,32 +31,32 @@ var DotPlot = {
 	changePlot: function() {
 		var self = this;
 
-		if (self.currentState == "bar")
+		if (self.currentSchool == "bar")
 			self.initDotPlot();
-		else if (self.currentState == "dot")
+		else if (self.currentSchool == "dot")
 			self.initBarChart();
 	},
 	initBarChart: function() {
 		var self = this;
 
-		if (self.currentState == "bar") // just in case
+		if (self.currentSchool == "bar") // just in case
 			return;
-		else if (self.currentState == "dot") // changing from dot to bar
+		else if (self.currentSchool == "dot") // changing from dot to bar
 			self.svg.selectAll("*").remove();
 
 		var yScale = d3.scale.ordinal()
-								.domain(Database.state)
+								.domain(Database.school)
 								.rangeBands([0, self.height]);
 
-		var state = self.svg.selectAll(".state")
+		var school = self.svg.selectAll(".school")
 							.data(self.summaryRankings[Database.currentIndex])
 							.enter()
 							.append("g")
 							.attr("class", function(d) {
-								return d[0][0].state.split(' ').join('-') + " state";
+								return d[0][0].school.split(' ').join('-') + " school";
 							})
 							.attr("transform", function(d) {
-								return "translate(0, " + yScale(d[0][0].state) + ")";
+								return "translate(0, " + yScale(d[0][0].school) + ")";
 							})
 							.attr("cursor", "pointer")
 							.on("mouseenter", function(d, i) {
@@ -65,17 +65,17 @@ var DotPlot = {
 									.attr("fill", "#999999");
 
 								// show the user that some is high and some is low
-								var stateRankings = Database.data[Database.currentIndex][i]; // an object
-								for (key in stateRankings) {
-									if (stateRankings[key] <= 17) {
+								var sschoolRankings = Database.data[Database.currentIndex][i]; // an object
+								for (key in schoolRankings) {
+									if (schoolRankings[key] <= 17) {
 										ArcView.svg.select("text." + key)
 													.style("fill", Database.highColour);
 									}
-									else if (stateRankings[key] > 17 && stateRankings[key] <= 34) {
+									else if (schoolRankings[key] > 17 && schoolRankings[key] <= 34) {
 										ArcView.svg.select("text." + key)
 													.style("fill", Database.moderateColour);
 									}
-									else if (stateRankings[key] > 34) {
+									else if (schoolRankings[key] > 34) {
 										ArcView.svg.select("text." + key)
 													.style("fill", Database.lowColour);
 									}
@@ -90,13 +90,13 @@ var DotPlot = {
 													.style("opacity", null);
 								}
 
-								// find common states
+								// find common schools
 								if (ArcView.isTwo) {
-									self.findCommonStates(stateRankings.abbr, "outcome");
-									self.findCommonStates(stateRankings.abbr, "factor");
+									self.findCommonSchools(schoolRankings.abbr, "outcome");
+									self.findCommonSchools(schoolRankings.abbr, "factor");
 								}
 								else {
-									self.findCommonStates(stateRankings.abbr, "variable");
+									self.findCommonSchools(schoolRankings.abbr, "variable");
 								}
 
 							})
@@ -109,7 +109,7 @@ var DotPlot = {
 								// restore text color
 								ArcView.svg.selectAll(".var-name text")
 											.style("fill", function(d) {
-												var outcomes = ["premDeath", "poorHealth", "poorPhyHealth", "poorMenHealth", "lowBWeight"];
+												var outcomes = ["ftEmployed", "ftGradSchool", "ptEmployed", "gapYear", "jobSearch"];
 
 												if ($.inArray(d, outcomes) != -1) // in the list
 													return Database.outcomeColour;
