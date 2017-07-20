@@ -165,13 +165,13 @@ var DotPlot = {
 												return nodeCoord[index].y;
 											});
 								if (ArcView.isTwo) {
-									ArcView.svg.selectAll(".outcome .state-label")
+									ArcView.svg.selectAll(".outcome .school-label")
 											.style("fill", Database.outcomeColour);
-									ArcView.svg.selectAll(".factor .state-label")
+									ArcView.svg.selectAll(".factor .school-label")
 											.style("fill", Database.factorColour);
 								}
 								else {
-									ArcView.svg.selectAll(".variable .state-label")
+									ArcView.svg.selectAll(".variable .school-label")
 												.style("fill", "#999999");
 								}
 							})
