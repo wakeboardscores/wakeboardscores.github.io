@@ -8,8 +8,8 @@ var SmallMultiples = {
 
         var self = this;
 
-        //default state is Georgia
-        self.state = state;
+        //default school is....
+        self.school = school;
 
         self.width = viewWidth - self.margin.left - self.margin.right;
         self.height = viewHeight - self.margin.top - self.margin.bottom;
@@ -21,18 +21,18 @@ var SmallMultiples = {
                     .attr("transform", "translate(" + self.margin.left + ", " + self.margin.top + ")");
 
         // draw small multiples
-        d3.select("#current-state")
+        d3.select("#current-school")
             .append("text")
             .attr("x", 10)
             .attr("y", 10)
             .attr("alignment-baseline", "central")
             .attr("fill", "black")
-            .text("Click on a state to see its detailed temporal trend.");
+            .text("Click on a school to see its detailed temporal trend.");
     },
-    create: function(state) {
+    create: function(school) {
         var self = this;
         var clean_data = [];
-        var year = [2013, 2014, 2015, 2016];
+        var year = [2013, 2014, 2015];
 
         // set up the data in following format:
         // {key: var1, value: [rank2013, rank2014,...}
@@ -45,10 +45,10 @@ var SmallMultiples = {
         }
 
         Database.data.forEach(function(yearData, i) {
-            yearData.forEach(function(stateData) {
-                if (stateData.state == state){
-                    for (var key in stateData){
-                        value = stateData[key];
+            yearData.forEach(function(schoolData) {
+                if (schoolData.school == school){
+                    for (var key in schoolData){
+                        value = schoolData[key];
                         clean_data.forEach(function(stateData) {
                             if (stateData.varName == key)
                                 stateData.value[i] = value;
@@ -62,7 +62,7 @@ var SmallMultiples = {
             if (i < 5)
                 d.type = "outcome"
             else
-                d.type = "factor"
+                d.type = "driver"
         });
 
         // used for position of each multiple
@@ -175,7 +175,7 @@ var SmallMultiples = {
         var self = this;
 
         self.svg.selectAll("*").remove();
-        d3.select("#current-state text")
+        d3.select("#current-school text")
             .text("Click on a state to see its detailed temporal trend.");
     }
 }
