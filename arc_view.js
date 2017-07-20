@@ -188,7 +188,7 @@ var ArcView = {
 
 		// draw bar charts
 		circleGroup.selectAll(".school-bar")
-					.data(Database.stateByRegions)
+					.data(Database.schoolByRegions)
 					.enter()
 					.append("rect")
 					.attr("class", function(d) {
